@@ -4,6 +4,7 @@ var rows = 20;
 var columns = 20;
 var board;
 var context;
+var gameOver = false;
 
 // Snake head
 var snakeX = blockSize * 5;
@@ -31,6 +32,10 @@ window.onload = function(){
 }
 
 function update(){
+    if (gameOver){
+        return;
+    }
+
     context.fillStyle="black";
     // X, Y coordinates, then width and height
     context.fillRect(0, 0, board.width, board.height);
@@ -43,6 +48,14 @@ function update(){
         placeFood();
     }
 
+    // Growing the length of the snake
+    for (let i = snakeBody.length-1; i > 0; i--){
+        snakeBody[i] = snakeBody[i-1];
+    }
+    if(snakeBody.length){
+        snakeBody[0] = [snakeX, snakeY];
+    }
+
     context.fillStyle="blue";
     snakeX += velocityX * blockSize;
     snakeY += velocityY * blockSize;
@@ -52,9 +65,22 @@ function update(){
         context.fillRect(snakeBody[i][0], snakeBody[i][1], blockSize, blockSize);
     }
     
+    // Game over conditions
+    if (snakeX < 0 || snakeX > columns*blockSize || snakeY < 0 || snakeY > rows*blockSize){
+        gameOver = true;
+        alert("Game Over");
+    }
+    
+    for(let i = 0; i < snakeBody.length; i++){
+        if (snakeX == snakeBody[i][0] && snakeY == snakeBody[i][1]){
+            gameOver = true;
+            alert("Game Over");
+        }
+    }
+
 }
 
-
+// Movement 
 function changeDirection(e){
     if (e.code == "ArrowUp" && velocityY != 1){
         velocityX = 0;
